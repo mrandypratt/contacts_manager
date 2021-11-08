@@ -62,25 +62,44 @@ app.get("/contacts/new", (req, res) => {
   res.render("create_new_contact");
 });
 
-app.post("/contacts/new", (req, res) => {
-  let errorMessages = [];
-  if (req.body.firstName.length === 0) {
-    errorMessages.push("First name is required.");
-  }
+app.post("/contacts/new",
+  (req, res, next) => {
+    res.locals.errorMessages = [];
+    
+    next();
+  },
 
-  if (req.body.lastName.length === 0) {
-    errorMessages.push("Phone number is required.");
-  }
+  (req, res, next) => {
+    if (req.body.firstName.length === 0) {
+      res.locals.errorMessages.push("First name is required.");
+    }
 
-  if (req.body.phoneNumber.length === 0) {
-    errorMessages.push("Phone number is required.");
-  }
+    next();
+  },
+  (req, res, next) => {
+    if (req.body.lastName.length === 0) {
+      res.locals.errorMessages.push("Last name is required.");
+    }
 
-  if (errorMessages.length > 0) {
-    res.render("create_new_contact", {
-      errorMessages: errorMessages,
-    });
-  } else {
+    next();
+  },
+  (req, res, next) => {
+    if (req.body.phoneNumber.length === 0) {
+      res.locals.errorMessages.push("Phone Number is required.");
+    }
+
+    next();
+  },
+  (req, res, next) => {
+    if (res.locals.errorMessages.length > 0) {
+      res.render("create_new_contact", {
+        errorMessages: res.locals.errorMessages,
+      });
+    } else {
+      next();
+    }
+  },
+  (req, res) => {
     contactData.push({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -89,7 +108,7 @@ app.post("/contacts/new", (req, res) => {
 
     res.redirect("/contacts");
   }
-});
+);
 
 app.listen(3000, "localhost", () => {
   console.log("Listening to port 3000.");
