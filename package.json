@@ -12,6 +12,7 @@
   "dependencies": {
     "epress": "^0.0.1-security",
     "express": "^4.17.1",
+    "express-validator": "^6.13.0",
     "morgan": "^1.10.0",
     "pug": "^3.0.2"
   },
